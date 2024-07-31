@@ -16,7 +16,7 @@ class Controller {
         void throwDice();
         void getData();
         void processData();
-        void displayInfo();
+        void displayProcessedData();
 
     private:
         LiquidCrystal_I2C lcd;

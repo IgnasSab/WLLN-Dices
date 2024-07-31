@@ -24,7 +24,7 @@ void Controller::processData() {
     this->iteration_num += 1;
     this->average = this->dice_sum / this->iterations_num;
 }
-void Controller::displayInfo() {
+void Controller::displayProcessedData() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Running average: ");

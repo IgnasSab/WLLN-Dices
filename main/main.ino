@@ -10,9 +10,10 @@ void setup() {
 void loop() {
 
 
-    dice.throwDice();
+    controller.throwDice();
 
-    rpi_com.sendPacket(); // Send notification to python 
-    rpi_com.receivePacket(); // Wait for information from python
+    controller.getData();
+
+    controller.displayData();
     
 }
