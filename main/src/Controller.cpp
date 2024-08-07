@@ -34,6 +34,7 @@ void Controller::throwDice() {
     this->dice.startThrow();
     delay(throw_delay);
     this->dice.stopThrow();
+    delay(throw_delay);
 }
 void Controller::getData() {
     this->rpi_com.sendPacket();

@@ -10,7 +10,7 @@
 #include "Arduino.h"
 #define int uint32_t
 
-#define throw_delay 2000 // Hardcoded value
+#define throw_delay 1000 // Hardcoded value
 
 
 class Controller {
@@ -21,8 +21,8 @@ class Controller {
         void sendInfo();
         int getMessageIterations();
 
-    private:
         void throwDice();
+    private:
         void getData();
         void processData();
         void displayProcessedData();
