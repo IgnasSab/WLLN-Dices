@@ -8,11 +8,11 @@ void RPI_COM::sendPacket() {
     Serial.println("CAPTURE");    
 }
 
-void RPI_COM::receivePacket() {
+int RPI_COM::receivePacket() {
     int pip_number;
     while (!Serial.available()) {
-        pip_number = Serial.readStringUntil('\n').toInt();
     }
+    pip_number = Serial.readStringUntil('\n').toInt();
     return pip_number;
 }
 

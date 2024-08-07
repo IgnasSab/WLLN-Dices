@@ -1,19 +1,21 @@
 #include "src/Controller.h"
 
 
+Controller controller;
+
 void setup() {
     Serial.begin(9600);
 
-    Serial.println("START");
 }
 
 void loop() {
 
+    controller.performIteration();
 
-    controller.throwDice();
+    if (controller.getIterationNum() != 0 && controller.getIterationNum() % controller.getMessageIterations() == 0) {
+        controller.sendInfo();
+    }
 
-    controller.getData();
-
-    controller.displayData();
+    delay(10); // Repeat it all again
     
 }
