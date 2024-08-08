@@ -11,6 +11,7 @@ class GSM {
         GSM();
         void sendMessage(String message);
         void receiveMessage();
+        void setup();
     private: 
         SoftwareSerial gsm;
         static const int pin_TX = 7;

@@ -1,13 +1,17 @@
 #include "Controller.h"
-//  lcd(0x27, 20, 4)
-
-Controller::
 
 Controller::Controller() {
     this->dice_sum = 0;
     this->iteration_num = 0;
     this->average = -1;
     this->current_pip_num = -1;
+    this->running = false;
+}
+
+void Controller::setup() {
+    this->dice.setup();
+    this->rpi_com.setup();
+    this->gsm.setup();
 }
 
 int Controller::getMessageIterations() {

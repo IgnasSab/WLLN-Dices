@@ -89,12 +89,13 @@ y_scaled = int(scale * (y_down - y_up))
 def preprocess_image(img):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img = img[y_up:y_down, x_left:x_right] 
-    img = cv2.medianBlur(img, 15)
+    # img = cv2.medianBlur(img, 15)
+    img = cv2.blur(img, (21, 26)) 
     img = cv2.resize(img, None, fx = scale, fy = scale)
     print("max value: ", np.max(img))
     print("min value: ", np.min(img))
     print("median value: ", np.median(img))
-    threshold = (np.max(img) - np.min(img) / 2) + np.median(img) - light_level * 5
+    threshold = (np.max(img) - np.min(img) / 3) + np.median(img) - light_level * 10
     if (threshold > 210):
         print("TOO MUCH LIGHT")
         threshold = 210
@@ -108,6 +109,7 @@ def preprocess_image(img):
                 img[i_][j_] = 255
             else:
                 img[i_][j_] = 0
+    cv2.imwrite('dice_bw.png', img);
     img = img / 255.0 
     return img
 
@@ -117,15 +119,13 @@ def predict(img):
     g = Graph(img)
     average = np.sum(img)
     num_islands = g.countIslands()
-    if (num_islands == 0 or num_islands > 6):
+    if (num_islands < 1 or num_islands > 6):
         return -1
-    elif (num_islands == 6 or (num_islands != 5 and average > average_threshold)):
-        return 6
     else:
         return num_islands
 ##################################################
 
-arduino = serial.Serial(port='COM5', baudrate=9600, timeout=.1)
+arduino = serial.Serial(port='COM10', baudrate=9600, timeout=1)
 
 video_capture = cv2.VideoCapture(0) # Open a connection to the camera (0 is usually the default camera)
 video_capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
@@ -163,6 +163,9 @@ def processFrame():
     print("Frame processed") # TODO
     print(pip_num)
     return pip_num
+
+
+arduino.write(bytes("START", 'utf-8')) # Send a starting signal to arduino
 
 while True: # Infinite loop
     if arduino.in_waiting > 0:  

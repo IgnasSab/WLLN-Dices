@@ -1,6 +1,9 @@
 #include "Components.h"
 
 GSM::GSM() : gsm(this->pin_TX, this->pin_RX) {
+}
+
+void GSM::setup() {
     this->gsm.begin(bitrate);
     this->phone_number = "+37062169269"; // Hard code it
 }

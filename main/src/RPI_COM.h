@@ -8,6 +8,7 @@ class RPI_COM {
         RPI_COM();
         void sendPacket();
         int receivePacket();
+        void setup();
 };
 
 #endif
