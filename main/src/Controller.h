@@ -21,6 +21,8 @@ class Controller {
         void sendInfo();
         int getMessageIterations();
         void setup();
+        bool isRunning();
+        void startStop();
     private:
         bool running;
         void throwDice();

@@ -8,6 +8,37 @@ Controller::Controller() {
     this->running = false;
 }
 
+String parsePhoneNumber(String data) {
+    // Find the position of the first quote
+    int startIndex = data.indexOf('\"') + 1; // Move to the character after the first quote
+    int endIndex = data.indexOf('\"', startIndex); // Find the next quote
+
+    // Extract the phone number using substring
+    return data.substring(startIndex, endIndex);
+}
+
+String parseMessageContent(String data) {
+    // Find the position of the newline character
+    int newlineIndex = data.indexOf('\n', 2);
+
+    // Extract the message content after the newline
+    if (newlineIndex != -1) {
+        return data.substring(newlineIndex + 1, data.length() - 2); // Get everything after the newline
+    }
+}
+void Controller::startStop() {
+    if (this->gsm.receivedMessage()) {
+        String msg = this->gsm.readMessage();
+        String phone_number = parsePhoneNumber(msg);
+        String content = parseMessageContent(msg);
+        if (content.equals("start") && phone_number.equals(this->gsm.getNumber()) && this->running == false) {
+            this->running = true;
+        } else if (content.equals("stop") && phone_number.equals(this->gsm.getNumber()) && this->running == true) {
+            this->running = false;
+        }
+    }
+}
+
 void Controller::setup() {
     this->dice.setup();
     this->rpi_com.setup();
@@ -28,6 +59,10 @@ void Controller::sendInfo() {
                                     + String(this->iteration_num));
 }
 
+bool Controller::isRunning() {
+    return this->running;
+}
+
 void Controller::performIteration() {
     this->throwDice();
     this->getData();
@@ -42,7 +77,7 @@ void Controller::throwDice() {
 }
 void Controller::getData() {
     this->rpi_com.sendPacket();
-    delay(10);
+    delay(100);
     this->current_pip_num = this->rpi_com.receivePacket();
     this->processData();
 }

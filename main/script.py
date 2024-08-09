@@ -8,6 +8,7 @@ import numpy as np
 
 ##################################################
 # Program to count islands in boolean 2D matrix
+
 class Graph:
 
     def __init__(self, g):
@@ -15,6 +16,7 @@ class Graph:
         self.COL = len(g[0])
         self.graph = g
         self.pixel_count = 0
+        self.decent_pixel_count = False
 
     # A function to check if a given cell
     # (row, col) can be included in DFS
@@ -31,8 +33,10 @@ class Graph:
     # the 8 neighbours as adjacent vertices
 
     def DFS(self, i, j, visited):
-        if (self.pixel_count > 400):
+        if (self.pixel_count > 500):
             return
+        elif (self.pixel_count > 200):
+            self.decent_pixel_count = True
         else:
             self.pixel_count += 1
 
@@ -72,9 +76,13 @@ class Graph:
                     # and increment island count
                     self.DFS(i, j, visited)
                     self.pixel_count = 0
+                    if (self.pixel_count > 500):
+                        return -1
                     count += 1
                     if count > 6:
                         return count
+                    elif self.decent_pixel_count == True:
+                        return 6
 
         return count
 
@@ -82,34 +90,22 @@ x_left = 30 # 0
 x_right = 600 # 640
 y_up = 0 # 0
 y_down = 460 # 480
-light_level = 3
+light_level = 20
 scale = 0.5
 x_scaled = int(scale * (x_right - x_left))
 y_scaled = int(scale * (y_down - y_up))
 def preprocess_image(img):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img = img[y_up:y_down, x_left:x_right] 
-    # img = cv2.medianBlur(img, 15)
-    img = cv2.blur(img, (21, 26)) 
-    img = cv2.resize(img, None, fx = scale, fy = scale)
-    print("max value: ", np.max(img))
-    print("min value: ", np.min(img))
-    print("median value: ", np.median(img))
-    threshold = (np.max(img) - np.min(img) / 3) + np.median(img) - light_level * 10
-    if (threshold > 210):
-        print("TOO MUCH LIGHT")
-        threshold = 210
-    elif (threshold < 50):
-        print("TOO LITTLE LIGHT")
-        threshold = 50
-    print(threshold)
+    img = cv2.blur(img, (5, 5))
+    threshold = (np.max(img) - np.min(img)) / 2 + np.median(img)
     for i_ in range(0, len(img)):
         for j_ in range(0, len(img[0])):
             if img[i_][j_] > threshold:
                 img[i_][j_] = 255
             else:
                 img[i_][j_] = 0
-    cv2.imwrite('dice_bw.png', img);
+    cv2.imwrite('/home/ignas/Desktop/WLLN_Dice/dice_bw.png', img);
     img = img / 255.0 
     return img
 
@@ -125,7 +121,8 @@ def predict(img):
         return num_islands
 ##################################################
 
-arduino = serial.Serial(port='COM10', baudrate=9600, timeout=1)
+arduino = serial.Serial(port='/dev/ttyACM0', baudrate=9600, timeout=1)
+# arduino = serial.Serial(port='COM10', baudrate=9600, timeout=1)
 
 video_capture = cv2.VideoCapture(0) # Open a connection to the camera (0 is usually the default camera)
 video_capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
@@ -140,7 +137,7 @@ def capture_frame():
     if ret:
         # Save the captured frame as an image file
         try:   
-            cv2.imwrite('dice.png', frame)
+            cv2.imwrite('/home/ignas/Desktop/WLLN_Dice/dice.png', frame)
         except (e):
             print("Error occurred, couldn't write the file")
         print("Captured frame")
@@ -154,7 +151,7 @@ def captureFrame():
 
 def processFrame():
     try:
-        img = cv2.imread('dice.png')
+        img = cv2.imread('/home/ignas/Desktop/WLLN_Dice/dice.png')
     except (e):
         print("Couldn't read the file")
 
@@ -166,7 +163,8 @@ def processFrame():
 
 
 arduino.write(bytes("START", 'utf-8')) # Send a starting signal to arduino
-
+ret, frame = video_capture.read() # Capture the first frame
+print("READY")  
 while True: # Infinite loop
     if arduino.in_waiting > 0:  
         line = arduino.readline().decode('utf-8') # Read data from arduino
@@ -174,3 +172,5 @@ while True: # Infinite loop
             # Capture the frame
             pip_num = captureFrame()
             arduino.write(bytes(str(pip_num), 'utf-8'))
+        else:
+            print(line)

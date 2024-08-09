@@ -10,8 +10,10 @@ class GSM {
     public:
         GSM();
         void sendMessage(String message);
-        void receiveMessage();
+        bool receivedMessage();
+        String readMessage();
         void setup();
+        String getNumber();
     private: 
         SoftwareSerial gsm;
         static const int pin_TX = 7;
